@@ -23,7 +23,7 @@ function init() {
             }
         }
     });
-
+//
     // Handling arrow keys for input
     document.addEventListener('keydown', function(event) {
         if (event.code === 'ArrowUp' || event.code === 'ArrowDown') {
