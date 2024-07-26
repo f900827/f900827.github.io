@@ -138,7 +138,7 @@ function init() {
             } else {
                 resultText = `${message}\nReaction Time: ${responseTime} ms\nDot Position: Y=${dotPositionY}\nClick Position: Y=${clickY}px`;
             }
-            //resultMessage.textContent = resultText;
+            resultMessage.textContent = resultText;
             console.log(resultText);
 
             showResultMessage(clickY, inputType);
@@ -156,7 +156,7 @@ function init() {
                 resultText = `Incorrect\nDot was in the center, should not react.\nReaction Time: ${responseTime} ms`;
             }
 
-            //resultMessage.textContent = resultText;
+            resultMessage.textContent = resultText;
             console.log(resultText);
             showResultMessage();
         }
