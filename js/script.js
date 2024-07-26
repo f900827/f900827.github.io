@@ -23,8 +23,13 @@ function init() {
             }
         }
     });
-//
-    // Handling arrow keys for input
+
+    startButton.addEventListener('click', function() {
+        startButton.style.display = 'none';
+        startExperiment();
+    });
+
+     // Handling arrow keys for input
     document.addEventListener('keydown', function(event) {
         if (event.code === 'ArrowUp' || event.code === 'ArrowDown') {
             event.preventDefault();
@@ -135,7 +140,7 @@ function init() {
             } else {
                 resultText = `${message}\nReaction Time: ${responseTime} ms\nDot Position: Y=${dotPositionY}\nClick Position: Y=${clickY}px`;
             }
-            //resultMessage.textContent = resultText;
+            resultMessage.textContent = resultText;
             console.log(resultText);
 
             showResultMessage(clickY, inputType);
@@ -153,7 +158,7 @@ function init() {
                 resultText = `Incorrect\nDot was in the center, should not react.\nReaction Time: ${responseTime} ms`;
             }
 
-            //resultMessage.textContent = resultText;
+            resultMessage.textContent = resultText;
             console.log(resultText);
             showResultMessage();
         }
@@ -193,7 +198,7 @@ function init() {
                 resultMessage.style.display = 'block';
                 textContainer.style.display = 'none';
                 textContainer2.style.display = 'none';
-            }, 300);
+            }, 500);
     
             setTimeout(() => {
                 resultMessage.style.display = 'none';
