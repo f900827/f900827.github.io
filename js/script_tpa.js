@@ -43,7 +43,7 @@ function init() {
     });
 
     function startExperiment() {
-        resetState();
+        //resetState();
         startButton.style.display = 'none';
         experiment.style.display = 'flex';
         isExperimentRunning = true;
@@ -81,8 +81,8 @@ function init() {
     function showText(startTime, dotPositionY) {
         textContainer.style.top = '10%';
         textContainer.style.display = 'block';
-        textContainer2.style.top = '90%';
-        textContainer2.style.display = 'block';
+        //textContainer2.style.top = '90%';
+        //textContainer2.style.display = 'block';
         
         let isClickHandled = false;
         let timeoutId;
