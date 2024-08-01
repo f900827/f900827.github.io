@@ -13,6 +13,7 @@ body, html {
     position: absolute;
     top: 50%;
     left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 50px;
     color: #252323;
     display: none;
@@ -22,6 +23,7 @@ body, html {
     position: absolute;
     width: 20px;
     left: 50%;
+    transform: translateX(-50%);
     height: 20px;
     background-color: #252323;
     border-radius: 50%;
@@ -40,7 +42,6 @@ body, html {
     display: none;
     width: 90%;
     height: 90%;
-    border: 0.5px solid #000;
     justify-content: center;
     align-items: flex-start;
     position: relative;
@@ -74,7 +75,8 @@ body, html {
     height: 50px;
     background-color: rgb(151, 141, 141);
     border-radius: 50%;
-    margin-bottom: 10px; /* 控制圓點之間的間隔 */
+    margin-bottom: 5px; /* 控制圓點之間的間隔 */
+    cursor: pointer; /* 改變鼠標指針形狀表示可點擊 */
 }
 
 .circle:last-child {

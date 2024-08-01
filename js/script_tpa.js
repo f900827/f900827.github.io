@@ -3,36 +3,19 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     const startButton = document.getElementById('startButton');
     const experiment = document.getElementById('experiment');
-    const dot = document.querySelector('.dot');
-    const pluSign = document.querySelector('.plus-sign');
+    const plusSign = document.querySelector('.plus-sign');
     const indicator = document.getElementById('indicator');
     const textContainer = document.getElementById('text-container');
     const resultMessage = document.getElementById('resultMessage');
-    let trialCount = 0;
-    const maxTrials = 25;
+    const textLines = textContainer.querySelectorAll('.text-line');
     let isExperimentRunning = false;
     let currentExpType = 1;  // 1: SR相容, 2: SR不相容
-    let isNoGoTrial = false;
+    let trialCount = 0;
+    const maxTrials = 25;
 
-    // Start experiment 
-    document.addEventListener('keydown', function(event) {
-        if (event.code === 'Space') {
-            event.preventDefault();
-            if (!isExperimentRunning) {
-                startExperiment();
-            }
-        }
-    });
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
         startExperiment();
-    });
-    // Handling arrow keys for input
-    document.addEventListener('keydown', function(event) {
-        if (event.code === 'ArrowUp' || event.code === 'ArrowDown') {
-            event.preventDefault();
-            
-        }
     });
 
     // Handling touch input within the experiment area
@@ -42,65 +25,77 @@ function init() {
         }
     });
 
+    // Adding click event listeners to circles
+    const circles = document.querySelectorAll('.circle');
+    circles.forEach((circle, index) => {
+        circle.addEventListener('click', function() {
+            handleCircleClick(index);
+        });
+    });
+
     function startExperiment() {
-        //resetState();
-        startButton.style.display = 'none';
+        resetState();
         experiment.style.display = 'flex';
         isExperimentRunning = true;
         showPlusSign();
     }
 
+    function resetState() {
+        trialCount = 0;
+        isExperimentRunning = false;
+        plusSign.style.display = 'none';
+        textContainer.style.display = 'none';
+    }
+
     function showPlusSign() {
-        pluSign.style.display = 'block';
+        plusSign.style.display = 'block';
         setTimeout(hidePlusSign, 250);
     }
 
     function hidePlusSign() {
-        pluSign.style.display = 'none';
-        showDot();
+        plusSign.style.display = 'none';
+        showText();
     }
 
-    function showDot() {
-        if (trialCount % 5 === 0) {
-            dot.style.top = '50%';
-            isNoGoTrial = true;
-        } else {
-            const dotPositionY = Math.random() < 0.5 ? '5%' : '95%';
-            dot.style.top = dotPositionY;
-            isNoGoTrial = false;
-        }
-        dot.style.display = 'block';
-        const startTime = Date.now();
-
-        setTimeout(() => {
-            dot.style.display = 'none';
-            showText(startTime, dot.style.top);
-        }, 150);
-    }
-
-    function showText(startTime, dotPositionY) {
-        textContainer.style.top = '10%';
+    function showText() {
+        const textPositionY = Math.random() < 0.5 ? '5%' : '95%';
+        textContainer.style.top = textPositionY;
+        textContainer.style.transform = 'translateY(-50%)'; // 垂直居中于指定位置
         textContainer.style.display = 'block';
-        //textContainer2.style.top = '90%';
-        //textContainer2.style.display = 'block';
-        
-        let isClickHandled = false;
-        let timeoutId;
-        
-        function handleKeyPress(event) { 
-            if (isClickHandled) return;
+    }
 
-            if (event.code === 'ArrowUp' || event.code === 'ArrowDown') {
-                event.preventDefault();
-                isClickHandled = true;
+    function handleCircleClick(index) {
+        let isCorrect = false;
+        const textPositionY = textContainer.style.top;
 
-                if (isNoGoTrial) {
-                    handleNogoTrialResult(startTime, false);
-                } else {
-                    const keyDirection = event.code === 'ArrowUp' ? 'Up' : 'Down';
-                    handleResult(null, dotPositionY, startTime, 'arrow', keyDirection);
-                }
+        if (currentExpType === 1) {
+            if (index === 0) {
+                isCorrect = textPositionY === '5%';
+            } else if (index === 2) {
+                isCorrect = textPositionY === '95%';
+            }
+        } else if (currentExpType === 2) {
+            if (index === 0) {
+                isCorrect = textPositionY === '95%';
+            } else if (index === 2) {
+                isCorrect = textPositionY === '5%';
             }
         }
+
+        // 移動文本到正中間
+        textContainer.style.top = '50%';
+        textContainer.style.transform = 'translateY(-50%)'; // 垂直居中于指定位置
+
+        // 延遲500毫秒後隱藏文本並顯示結果消息
+        setTimeout(() => {
+            textContainer.style.display = 'none';
+            resultMessage.innerText = isCorrect ? "Correct!" : "Incorrect!";
+            resultMessage.style.display = 'block';
+
+            // 再延遲500毫秒後隱藏結果消息
+            setTimeout(() => {
+                resultMessage.style.display = 'none';
+            }, 500);
+        }, 500);
     }
 }
