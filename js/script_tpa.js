@@ -2,15 +2,13 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     const startButton = document.getElementById('startButton');
-    const circles = document.querySelectorAll('.circle');
     const experiment = document.getElementById('experiment');
     const plusSign = document.querySelector('.plus-sign');
     const indicator = document.getElementById('indicator');
     const textContainer = document.getElementById('text-container');
     const resultMessage = document.getElementById('resultMessage');
-    const textLines = textContainer.querySelectorAll('.text-line');
     let isExperimentRunning = false;
-    let currentExpType = 1;  // 1: SR相容, 2: SR不相容
+    let currentExpType = 1;  // 1: windowimg/SR相容, 2: scrolling/SR不相容
     let trialCount = 0;
     const maxTrials = 25;
     let startTime, timeoutId;
@@ -32,16 +30,13 @@ function init() {
             handleCircleClick(Array.from(indicator.children).indexOf(event.target), 'touch');
         }
     });
-   
-  
 
-    function startExperiment() 
+    function startExperiment() {
         resetState();
         experiment.style.display = 'flex';
         isExperimentRunning = true;
         showPlusSign();
     }
-
 
     function resetState() {
         isExperimentRunning = false;
@@ -49,7 +44,7 @@ function init() {
         textContainer.style.display = 'none';
         resultMessage.style.display = 'none';
     }
-        
+
     function showPlusSign() {
         plusSign.style.display = 'block';
         setTimeout(hidePlusSign, 250);
@@ -66,19 +61,14 @@ function init() {
         textContainer.style.top = textPositionY;
         textContainer.style.transform = 'translateY(-50%)'; // 垂直居中于指定位置
         textContainer.style.display = 'block';
-       
-       
+
         startTime = Date.now();
-        timeoutId = setTimeout(() => {
-            handleNoReaction();
-        }, 1500);
+        timeoutId = setTimeout(handleNoReaction, 1500);
     }
 
-    
-   function handleNoReaction() {
+    function handleNoReaction() {
         if (!isExperimentRunning) return;
-        const endTime = Date.now();
-        const responseTime = endTime - startTime;
+        isExperimentRunning = false;
 
         // Display the result as "Incorrect" since no response was given within 1500ms
         resultMessage.innerText = "Incorrect!";
@@ -98,11 +88,10 @@ function init() {
         }, 500);
     }
 
-    function handleCircleClick(index, inputeType) {
+    function handleCircleClick(index, inputType) {
         if (!isExperimentRunning) return;
         clearTimeout(timeoutId);
 
-        
         const endTime = Date.now();
         const responseTime = endTime - startTime;
         let isCorrect = false;
@@ -135,23 +124,14 @@ function init() {
             // 再延遲500毫秒後隱藏結果消息
             setTimeout(() => {
                 resultMessage.style.display = 'none';
+                trialCount++;
+                if (trialCount < maxTrials) {
+                    setTimeout(startExperiment, 500);
+                } else {
+                    alert('Experiment completed');
+                    window.location.reload();
+                }
             }, 500);
         }, 500);
     }
-
-     function resetExperiment(onClick, inputType ) {
-        experiment.style.display = 'none';
-        textContainer.style.display = 'none';
-        experiment.removeEventListener('click', onClick);
-        trialCount++;
-        isExperimentRunning = false;
-        if (trialCount < maxTrials) {
-            setTimeout(startExperiment, 500);
-        } else {
-            alert('Experiment completed');
-            window.location.reload();
-        }
-    }
-
-
 }
