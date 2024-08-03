@@ -4,11 +4,12 @@ function init() {
     const startButton = document.getElementById('startButton');
     const experiment = document.getElementById('experiment');
     const plusSign = document.querySelector('.plus-sign');
-    const indicator = document.getElementById('indicator');
+    const indicatorVertical = document.getElementById('indicator-vertical');
+    const indicatorHorizontal = document.getElementById('indicator-horizontal');
     const textContainer = document.getElementById('text-container');
     const resultMessage = document.getElementById('resultMessage');
     let isExperimentRunning = false;
-    let currentExpType = 1;  // 1: windowimg/SR相容, 2: scrolling/SR不相容
+    let currentExpType = 1;  // 1: SR相容, 2: SR不相容, 3: 左右相容, 4: 左右不相容
     let trialCount = 0;
     const maxTrials = 25;
     let startTime, timeoutId;
@@ -18,16 +19,28 @@ function init() {
         startExperiment();
     });
 
-    indicator.addEventListener('click', function(event) {
+    indicatorVertical.addEventListener('click', function(event) {
         if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(Array.from(indicator.children).indexOf(event.target), 'mouse');
+            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'mouse');
         }
     });
-    
-    // Handling touch input within the experiment area
-    indicator.addEventListener('touchstart', function(event) {
+
+    indicatorHorizontal.addEventListener('click', function(event) {
         if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(Array.from(indicator.children).indexOf(event.target), 'touch');
+            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'mouse');
+        }
+    });
+
+    // Handling touch input within the experiment area
+    indicatorVertical.addEventListener('touchstart', function(event) {
+        if (isExperimentRunning && event.target.classList.contains('circle')) {
+            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'touch');
+        }
+    });
+
+    indicatorHorizontal.addEventListener('touchstart', function(event) {
+        if (isExperimentRunning && event.target.classList.contains('circle')) {
+            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'touch');
         }
     });
 
@@ -43,6 +56,8 @@ function init() {
         plusSign.style.display = 'none';
         textContainer.style.display = 'none';
         resultMessage.style.display = 'none';
+        indicatorVertical.style.display = 'none';
+        indicatorHorizontal.style.display = 'none';
     }
 
     function showPlusSign() {
@@ -57,35 +72,51 @@ function init() {
 
     function showText() {
         const textPositionY = Math.random() < 0.5 ? '5%' : '95%';
-        indicator.style.display = 'block';
-        textContainer.style.top = textPositionY;
-        textContainer.style.transform = 'translateY(-50%)'; // 垂直居中于指定位置
+        const textPositionX = Math.random() < 0.5 ? '5%' : '95%';
+        currentExpType = Math.ceil(Math.random() * 4);
+
+        switch (currentExpType) {
+            case 1: // 上下相容
+            case 2: // 上下不相容
+                indicatorVertical.style.display = 'block';
+                textContainer.style.top = textPositionY;
+                textContainer.style.left = '50%';
+                textContainer.style.transform = 'translate(-50%, -50%)';
+                break;
+            case 3: // 左右相容
+            case 4: // 左右不相容
+                indicatorHorizontal.style.display = 'flex';
+                indicatorHorizontal.style.bottom = '10px';
+                indicatorHorizontal.style.left = '50%';
+                indicatorHorizontal.style.transform = 'translateX(-50%)';
+                textContainer.style.top = '50%';
+                textContainer.style.left = textPositionX;
+                textContainer.style.transform = 'translate(-50%, -50%)';
+                break;
+        }
+
         textContainer.style.display = 'block';
 
         startTime = Date.now();
-        timeoutId = setTimeout(handleNoReaction, 1500);
+        timeoutId = setTimeout(() => {
+            handleNoReaction();
+        }, 1500);
     }
 
     function handleNoReaction() {
         if (!isExperimentRunning) return;
-        isExperimentRunning = false;
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
+        console.log(`No reaction. Response time: ${responseTime}ms`);
 
-        // Display the result as "Incorrect" since no response was given within 1500ms
-        resultMessage.innerText = "Incorrect!";
-        resultMessage.style.display = 'block';
         textContainer.style.display = 'none';
-
-        // Hide result message after 500ms
-        setTimeout(() => {
-            resultMessage.style.display = 'none';
-            trialCount++;
-            if (trialCount < maxTrials) {
-                setTimeout(startExperiment, 500);
-            } else {
-                alert('Experiment completed');
-                window.location.reload();
-            }
-        }, 500);
+        trialCount++;
+        if (trialCount < maxTrials) {
+            setTimeout(startExperiment, 500);
+        } else {
+            alert('Experiment completed');
+            window.location.reload();
+        }
     }
 
     function handleCircleClick(index, inputType) {
@@ -94,44 +125,23 @@ function init() {
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        let isCorrect = false;
-        const textPositionY = textContainer.style.top;
-
-        if (currentExpType === 1) {
-            if (index === 0) {
-                isCorrect = textPositionY === '5%';
-            } else if (index === 2) {
-                isCorrect = textPositionY === '95%';
-            }
-        } else if (currentExpType === 2) {
-            if (index === 0) {
-                isCorrect = textPositionY === '95%';
-            } else if (index === 2) {
-                isCorrect = textPositionY === '5%';
-            }
-        }
+        console.log(`Response time: ${responseTime}ms, Circle Index: ${index}`);
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
-        textContainer.style.transform = 'translateY(-50%)'; // 垂直居中于指定位置
+        textContainer.style.left = '50%';
+        textContainer.style.transform = 'translate(-50%, -50%)';
 
-        // 延遲500毫秒後隱藏文本並顯示結果消息
+        // 延遲500毫秒後隱藏文本
         setTimeout(() => {
             textContainer.style.display = 'none';
-            resultMessage.innerText = isCorrect ? "Correct!" : "Incorrect!";
-            resultMessage.style.display = 'block';
-
-            // 再延遲500毫秒後隱藏結果消息
-            setTimeout(() => {
-                resultMessage.style.display = 'none';
-                trialCount++;
-                if (trialCount < maxTrials) {
-                    setTimeout(startExperiment, 500);
-                } else {
-                    alert('Experiment completed');
-                    window.location.reload();
-                }
-            }, 500);
+            trialCount++;
+            if (trialCount < maxTrials) {
+                setTimeout(startExperiment, 500);
+            } else {
+                alert('Experiment completed');
+                window.location.reload();
+            }
         }, 500);
     }
 }

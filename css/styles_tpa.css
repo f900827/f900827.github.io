@@ -6,7 +6,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
+    background-color: #eee6e6;
 }
 
 .plus-sign {
@@ -42,25 +42,30 @@ body, html {
     display: none;
     width: 90%;
     height: 90%;
-    justify-content: center;
-    align-items: flex-start;
-    position: relative;
+    justify-content:center;
+    align-items: center;
+    flex-direction: column;
 }
-
+    
+.text-line {
+    font-size: 20px;
+    text-align: center;
+    margin: 10px 0;
+}
+    
 #text-container {
     display: none;
     position: absolute;
-    transition: top 0.3s, transform 0.3s;
-    width: 100%;
-    transform: translateY(-50%);
+    width: 60%;
 }
-
-.text-line {
-    margin: 5px 0;
-    font-size: 20px;
+    
+#resultMessage {
+    font-size: 25px;
+    color: #6c6c6c;
+    display: none;
 }
-
-#indicator {
+    
+#indicator-vertical {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -69,16 +74,23 @@ body, html {
     flex-direction: column;
     align-items: center;
 }
-
+    
+#indicator-horizontal {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+}
+    
 .circle {
     width: 50px;
     height: 50px;
     background-color: rgb(151, 141, 141);
     border-radius: 50%;
-    margin-bottom: 5px; /* 控制圓點之間的間隔 */
-    cursor: pointer; /* 改變鼠標指針形狀表示可點擊 */
-}
-
-.circle:last-child {
-    margin-bottom: 0; /* 去除最後一個圓點的底部間隔 */
+    margin: 5px; /* 控制圓點之間的間隔 /
+    cursor: pointer; / 改變鼠標指針形狀表示可點擊 */
 }
