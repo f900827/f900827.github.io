@@ -7,21 +7,24 @@ function init() {
     const indicatorVertical = document.getElementById('indicator-vertical');
     const indicatorHorizontal = document.getElementById('indicator-horizontal');
     const textContainer = document.getElementById('text-container');
+    const maxTrials = 24;
     let isExperimentRunning = false;
     let trialCount = 0;
-    const maxTrials = 24;
     let startTime, timeoutId;
-    let directionCounts = { up: 0, down: 0, left: 0, right: 0 };
+    let directionArray = generateDirectionArray();
+    let currentDirection = 'none';
+    let waitClick = true;
 
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
-        startExperiment();
+        startTrial();
     });
 
     [indicatorVertical, indicatorHorizontal].forEach(indicator => {
         ['click', 'touchstart'].forEach(eventType => {
             indicator.addEventListener(eventType, function(event) {
-                if (isExperimentRunning && event.target.classList.contains('circle')) {
+                if (isExperimentRunning && event.target.classList.contains('circle') && waitClick) {
+                    waitClick = false;
                     const inputType = eventType === 'click' ? 'mouse' : 'touch';
                     handleCircleClick(parseInt(event.target.getAttribute('data-index')), inputType);
                 }
@@ -29,11 +32,14 @@ function init() {
         });
     });
 
-    function startExperiment() {
+    function startTrial() {
+        trialCount++;
         resetState();
         experiment.style.display = 'flex';
         isExperimentRunning = true;
         showPlusSign();
+        setTimeout(hidePlusSign, 250);
+        setTimeout(showText, 250);
     }
 
     function resetState() {
@@ -44,37 +50,37 @@ function init() {
 
     function showPlusSign() {
         plusSign.style.display = 'block';
-        setTimeout(hidePlusSign, 250);
     }
 
     function hidePlusSign() {
         plusSign.style.display = 'none';
-        showText();
+    }
+
+    // 產生本次實驗之所有directions
+    function generateDirectionArray() {
+        const directions = ['up', 'down', 'left', 'right'];
+        const maxPerDirection = 6;
+    
+        // 初始化包含每個方向6次的陣列
+        let directionArray = [];
+        for (let i = 0; i < maxPerDirection; i++) {
+            directionArray.push(...directions);
+        }
+    
+        // 使用Fisher-Yates算法洗牌陣列
+        for (let i = directionArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [directionArray[i], directionArray[j]] = [directionArray[j], directionArray[i]];
+        }
+    
+        return directionArray;
     }
 
     function showText() {
-        let direction;
-        let randomNum = Math.random();
-        if (randomNum < 0.25 && directionCounts.up < 6) {
-            direction = 'up';
-        } else if (randomNum < 0.5 && directionCounts.down < 6) {
-            direction = 'down';
-        } else if (randomNum < 0.75 && directionCounts.left < 6) {
-            direction = 'left';
-        } else if (directionCounts.right < 6) {
-            direction = 'right';
-        } else {
-            // If one direction reaches 6 times, re-roll until we get a valid direction
-            showText();
-            return;
-        }
+        currentDirection = directionArray.pop()
 
-        directionCounts[direction]++;
-        trialCount++;
-
-        console.log(`Direction: ${direction}`);
-
-        switch (direction) {
+        // 針對不同direction處理UI顯示
+        switch (currentDirection) {
             case 'up':
                 indicatorVertical.style.display = 'block';
                 textContainer.style.top = '5%';
@@ -99,11 +105,14 @@ function init() {
                 textContainer.style.left = '95%';
                 textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
+            default:
+                break;
         }
 
         textContainer.style.display = 'block';
 
         startTime = Date.now();
+        // 兩秒內未進行任何行為則Timeout
         timeoutId = setTimeout(() => {
             handleNoReaction();
         }, 2000);
@@ -111,27 +120,25 @@ function init() {
 
     function handleNoReaction() {
         if (!isExperimentRunning) return;
-        const endTime = Date.now();
-        const responseTime = endTime - startTime;
-        console.log(`No reaction. Response time: ${responseTime}ms`);
+
+        console.log(`Trial ${trialCount}\nDirection: ${currentDirection}. No reaction.`);
 
         textContainer.style.display = 'none';
-        if (trialCount < maxTrials) {
-            setTimeout(startExperiment, 500);
-        } else {
-            alert('Experiment completed');
-            window.location.reload();
-        }
+
+        checkIfExceedMaxTrials()
     }
 
     function handleCircleClick(index, inputType) {
         if (!isExperimentRunning) return;
+        // 若有點擊則取消NoReaction Timeout
         clearTimeout(timeoutId);
 
+        // 計算反應時間
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        console.log(`Response time: ${responseTime}ms, Circle Index: ${index}`);
-        console.log(`Input type: ${inputType}`); // Logging input type here
+
+        // 紀錄當次行為資料(DB寫入點)
+        console.log(`Trial ${trialCount}\nDirection: ${currentDirection} Response time: ${responseTime}ms\nCircle Index: ${index} Input type: ${inputType}`);
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
@@ -143,12 +150,20 @@ function init() {
             textContainer.style.display = 'none';
             indicatorHorizontal.style.display = 'none';
             indicatorVertical.style.display = 'none';
-            if (trialCount < maxTrials) {
-                setTimeout(startExperiment, 500);
-            } else {
-                alert('Experiment completed');
-                window.location.reload();
-            }
+            checkIfExceedMaxTrials()
+            waitClick = true;
         }, 500);
+    }
+     
+    // 檢查當前Trial是否到達上限
+    function checkIfExceedMaxTrials(){
+        if (trialCount < maxTrials) {
+            setTimeout(startTrial, 500);
+        } else {
+            isExperimentRunning = false;
+            alert('Experiment completed');
+            //重整頁面
+            //window.location.reload();
+        }
     }
 }
