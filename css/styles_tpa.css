@@ -7,6 +7,10 @@ body, html {
     justify-content: center;
     align-items: center;
     background-color: #eee6e6;
+    -webkit-user-select: none; /* 禁用 Chrome、Safari 和 Opera */
+    -moz-user-select: none; /* 禁用 Firefox */
+    -ms-user-select: none; /* 禁用 Internet Explorer 和 Edge */
+    user-select: none; /* 標準屬性 */
 }
 
 .plus-sign {
@@ -89,8 +93,32 @@ body, html {
 .circle {
     width: 50px;
     height: 50px;
-    background-color: rgb(151, 141, 141);
+    background-color: #a7a4a4;
     border-radius: 50%;
-    margin: 5px; /* 控制圓點之間的間隔 /
-    cursor: pointer; / 改變鼠標指針形狀表示可點擊 */
+    margin: 5px; 
+    cursor: pointer; 
+}
+
+
+.circle[data-index="0"],
+.circle[data-index="2"],
+.circle[data-index="3"],
+.circle[data-index="5"] {
+    border: 1px solid #877e7e;
+    box-shadow: 3px 3px 3px #888888;
+}
+
+
+.circle[data-index="0"]:hover,
+.circle[data-index="2"]:hover,
+.circle[data-index="3"]:hover,
+.circle[data-index="5"]:hover {
+    background-color: #787575;
+}
+
+.circle[data-index="1"],
+.circle[data-index="4"] {
+    background-color: #a7a4a4;  
+    cursor: default; 
+    pointer-events: none;  
 }

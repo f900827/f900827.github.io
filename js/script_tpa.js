@@ -7,41 +7,26 @@ function init() {
     const indicatorVertical = document.getElementById('indicator-vertical');
     const indicatorHorizontal = document.getElementById('indicator-horizontal');
     const textContainer = document.getElementById('text-container');
-    const resultMessage = document.getElementById('resultMessage');
     let isExperimentRunning = false;
-    let currentExpType = 1;  // 1: SR相容, 2: SR不相容, 3: 左右相容, 4: 左右不相容
     let trialCount = 0;
-    const maxTrials = 25;
+    const maxTrials = 24;
     let startTime, timeoutId;
+    let directionCounts = { up: 0, down: 0, left: 0, right: 0 };
 
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
         startExperiment();
     });
 
-    indicatorVertical.addEventListener('click', function(event) {
-        if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'mouse');
-        }
-    });
-
-    indicatorHorizontal.addEventListener('click', function(event) {
-        if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'mouse');
-        }
-    });
-
-    // Handling touch input within the experiment area
-    indicatorVertical.addEventListener('touchstart', function(event) {
-        if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'touch');
-        }
-    });
-
-    indicatorHorizontal.addEventListener('touchstart', function(event) {
-        if (isExperimentRunning && event.target.classList.contains('circle')) {
-            handleCircleClick(parseInt(event.target.getAttribute('data-index')), 'touch');
-        }
+    [indicatorVertical, indicatorHorizontal].forEach(indicator => {
+        ['click', 'touchstart'].forEach(eventType => {
+            indicator.addEventListener(eventType, function(event) {
+                if (isExperimentRunning && event.target.classList.contains('circle')) {
+                    const inputType = eventType === 'click' ? 'mouse' : 'touch';
+                    handleCircleClick(parseInt(event.target.getAttribute('data-index')), inputType);
+                }
+            });
+        });
     });
 
     function startExperiment() {
@@ -53,9 +38,6 @@ function init() {
 
     function resetState() {
         isExperimentRunning = false;
-        plusSign.style.display = 'none';
-        textContainer.style.display = 'none';
-        resultMessage.style.display = 'none';
         indicatorVertical.style.display = 'none';
         indicatorHorizontal.style.display = 'none';
     }
@@ -71,26 +53,50 @@ function init() {
     }
 
     function showText() {
-        const textPositionY = Math.random() < 0.5 ? '5%' : '95%';
-        const textPositionX = Math.random() < 0.5 ? '5%' : '95%';
-        currentExpType = Math.ceil(Math.random() * 4);
+        let direction;
+        let randomNum = Math.random();
+        if (randomNum < 0.25 && directionCounts.up < 6) {
+            direction = 'up';
+        } else if (randomNum < 0.5 && directionCounts.down < 6) {
+            direction = 'down';
+        } else if (randomNum < 0.75 && directionCounts.left < 6) {
+            direction = 'left';
+        } else if (directionCounts.right < 6) {
+            direction = 'right';
+        } else {
+            // If one direction reaches 6 times, re-roll until we get a valid direction
+            showText();
+            return;
+        }
 
-        switch (currentExpType) {
-            case 1: // 上下相容
-            case 2: // 上下不相容
+        directionCounts[direction]++;
+        trialCount++;
+
+        console.log(`Direction: ${direction}`);
+
+        switch (direction) {
+            case 'up':
                 indicatorVertical.style.display = 'block';
-                textContainer.style.top = textPositionY;
+                textContainer.style.top = '5%';
                 textContainer.style.left = '50%';
                 textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
-            case 3: // 左右相容
-            case 4: // 左右不相容
+            case 'down':
+                indicatorVertical.style.display = 'block';
+                textContainer.style.top = '95%';
+                textContainer.style.left = '50%';
+                textContainer.style.transform = 'translate(-50%, -50%)';
+                break;
+            case 'left':
                 indicatorHorizontal.style.display = 'flex';
-                indicatorHorizontal.style.bottom = '10px';
-                indicatorHorizontal.style.left = '50%';
-                indicatorHorizontal.style.transform = 'translateX(-50%)';
                 textContainer.style.top = '50%';
-                textContainer.style.left = textPositionX;
+                textContainer.style.left = '5%';
+                textContainer.style.transform = 'translate(-50%, -50%)';
+                break;
+            case 'right':
+                indicatorHorizontal.style.display = 'flex';
+                textContainer.style.top = '50%';
+                textContainer.style.left = '95%';
                 textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
         }
@@ -100,7 +106,7 @@ function init() {
         startTime = Date.now();
         timeoutId = setTimeout(() => {
             handleNoReaction();
-        }, 1500);
+        }, 2000);
     }
 
     function handleNoReaction() {
@@ -110,7 +116,6 @@ function init() {
         console.log(`No reaction. Response time: ${responseTime}ms`);
 
         textContainer.style.display = 'none';
-        trialCount++;
         if (trialCount < maxTrials) {
             setTimeout(startExperiment, 500);
         } else {
@@ -126,6 +131,7 @@ function init() {
         const endTime = Date.now();
         const responseTime = endTime - startTime;
         console.log(`Response time: ${responseTime}ms, Circle Index: ${index}`);
+        console.log(`Input type: ${inputType}`); // Logging input type here
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
@@ -135,7 +141,8 @@ function init() {
         // 延遲500毫秒後隱藏文本
         setTimeout(() => {
             textContainer.style.display = 'none';
-            trialCount++;
+            indicatorHorizontal.style.display = 'none';
+            indicatorVertical.style.display = 'none';
             if (trialCount < maxTrials) {
                 setTimeout(startExperiment, 500);
             } else {
