@@ -44,6 +44,7 @@ function init() {
 
     function resetState() {
         isExperimentRunning = false;
+        textContainer.style.display = 'none';
         indicatorVertical.style.display = 'none';
         indicatorHorizontal.style.display = 'none';
     }
@@ -115,7 +116,7 @@ function init() {
         // 兩秒內未進行任何行為則Timeout
         timeoutId = setTimeout(() => {
             handleNoReaction();
-        }, 2000);
+        }, 3000);
     }
 
     function handleNoReaction() {
@@ -124,6 +125,8 @@ function init() {
         console.log(`Trial ${trialCount}\nDirection: ${currentDirection}. No reaction.`);
 
         textContainer.style.display = 'none';
+        indicatorHorizontal.style.display = 'none';
+        indicatorVertical.style.display = 'none';
 
         checkIfExceedMaxTrials()
     }
@@ -157,11 +160,11 @@ function init() {
      
     // 檢查當前Trial是否到達上限
     function checkIfExceedMaxTrials(){
-        if (trialCount < maxTrials) {
+        if (trialCount <= maxTrials) {
             setTimeout(startTrial, 500);
         } else {
-            isExperimentRunning = false;
-            alert('Experiment completed');
+            resetState();
+            alert('Experiment completed \n 請通知實驗人員');
             //重整頁面
             //window.location.reload();
         }
