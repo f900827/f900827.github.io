@@ -14,7 +14,6 @@ function init() {
     let directionArray = generateDirectionArray();
     let currentDirection = 'none';
     let waitClick = true;
-    let waitPlusClick = true;
 
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
@@ -162,10 +161,6 @@ function init() {
             checkIfExceedMaxTrials()
             waitClick = true;
         }, 500);
-    }
-    
-    function handlePlusClick() {
-        waitPlusClick = false;
     }
 
     // 檢查當前點擊之圓點是否與文章方向一致
