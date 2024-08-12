@@ -136,12 +136,14 @@ function init() {
         // 若有點擊則取消NoReaction Timeout
         clearTimeout(timeoutId);
 
+        let COM = checkCOM(index);
+
         // 計算反應時間
         const endTime = Date.now();
         const responseTime = endTime - startTime;
 
         // 紀錄當次行為資料(DB寫入點)
-        console.log(`Trial ${trialCount}\nDirection: ${currentDirection} Response time: ${responseTime}ms\nCircle Index: ${index} Input type: ${inputType}`);
+        console.log(`Trial ${trialCount}\nDirection: ${currentDirection} COM: ${COM}\nResponse time: ${responseTime}ms\nCircle Index: ${index} Input type: ${inputType}`);
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
@@ -157,10 +159,20 @@ function init() {
             waitClick = true;
         }, 500);
     }
+
+    // 檢查當前點擊之圓點是否與文章方向一致
+    function checkCOM(index){
+        let directionIndexArr = ['up', '', 'down', 'left', '', 'right'];
+        if(directionIndexArr[index] == currentDirection){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
      
     // 檢查當前Trial是否到達上限
     function checkIfExceedMaxTrials(){
-        if (trialCount <= maxTrials) {
+        if (trialCount < maxTrials) {
             setTimeout(startTrial, 500);
         } else {
             resetState();
