@@ -160,14 +160,11 @@ function init() {
      
     // 檢查當前Trial是否到達上限
     function checkIfExceedMaxTrials(){
-        if (trialCount < maxTrials) {
+        if (trialCount <= maxTrials) {
             setTimeout(startTrial, 500);
         } else {
             resetState();
-            setTimeout(() => {
-                alert('Experiment completed \n 請通知實驗人員');
-            }, 500);
-            
+            alert('Experiment completed \n 請通知實驗人員');
             //重整頁面
             //window.location.reload();
         }
