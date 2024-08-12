@@ -26,6 +26,7 @@ a {
     font-size: 50px;
     color: #252323;
     display: none;
+    cursor: pointer; 
 }
 
 .dot {

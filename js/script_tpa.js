@@ -14,9 +14,16 @@ function init() {
     let directionArray = generateDirectionArray();
     let currentDirection = 'none';
     let waitClick = true;
+    let waitPlusClick = true;
 
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
+        experiment.style.display = 'flex';
+        showPlusSign();
+    });
+
+    plusSign.addEventListener('click', function() {
+        hidePlusSign();
         startTrial();
     });
 
@@ -35,10 +42,7 @@ function init() {
     function startTrial() {
         trialCount++;
         resetState();
-        experiment.style.display = 'flex';
         isExperimentRunning = true;
-        showPlusSign();
-        setTimeout(hidePlusSign, 250);
         setTimeout(showText, 250);
     }
 
@@ -159,6 +163,10 @@ function init() {
             waitClick = true;
         }, 500);
     }
+    
+    function handlePlusClick() {
+        waitPlusClick = false;
+    }
 
     // 檢查當前點擊之圓點是否與文章方向一致
     function checkCOM(index){
@@ -173,10 +181,10 @@ function init() {
     // 檢查當前Trial是否到達上限
     function checkIfExceedMaxTrials(){
         if (trialCount < maxTrials) {
-            setTimeout(startTrial, 500);
+            setTimeout(showPlusSign(), 500);
         } else {
             resetState();
-            alert('Experiment completed \n 請通知實驗人員');
+            alert('Experiment completed \n請通知實驗人員');
             //重整頁面
             //window.location.reload();
         }
