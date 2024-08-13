@@ -160,7 +160,7 @@ function init() {
             indicatorVertical.style.display = 'none';
             checkIfExceedMaxTrials()
             waitClick = true;
-        }, 500);
+        }, 600);
     }
 
     // 檢查當前點擊之圓點是否與文章方向一致

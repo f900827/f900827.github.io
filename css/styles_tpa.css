@@ -6,7 +6,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #eee6e6;
+    background-color: rgb(238, 237, 230);
     -webkit-user-select: none; /* 禁用 Chrome、Safari 和 Opera */
     -moz-user-select: none; /* 禁用 Firefox */
     -ms-user-select: none; /* 禁用 Internet Explorer 和 Edge */
@@ -23,7 +23,8 @@ a {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 50px;
+    font-size: 60px;
+    font-weight: bold;
     color: #252323;
     display: none;
     cursor: pointer; 
@@ -97,8 +98,8 @@ a {
 }
     
 .circle {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     /* background-color: #a7a4a4; */
     border-radius: 50%;
     margin: 5px; 
