@@ -187,7 +187,7 @@ function init() {
         const responseTime = endTime - startTime;
 
         // 紀錄當次行為資料(DB寫入點)
-        console.log(`Trial ${trialCount}\nDirection: ${currentDirection} COM: ${COM}\nResponse time: ${responseTime}ms\nCircle Index: ${index} Input type: ${inputType}`);
+        console.log(`Trial ${trialCount}\nDirection: ${currentDirection} \nCircle Index: ${index} \nRT: ${responseTime}ms\nInput type: ${inputType}\ncom: ${COM}`);
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
@@ -201,7 +201,7 @@ function init() {
             indicatorVertical.style.display = 'none';
             checkIfExceedMaxTrials()
             waitClick = true;
-        }, 500);
+        }, 600);
     }
 
     // 檢查當前點擊之圓點是否與文章方向一致

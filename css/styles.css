@@ -6,16 +6,18 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
+    background-color: #F2D7C5;
 }
 
 .plus-sign {
     position: absolute;
     top: 50%;
     left: 50%;
-    font-size: 50px;
+    font-size: 60px;
+    font-weight: bold;
     color: #252323;
     display: none;
+    transform: translate(-50%, -50%);
 }
 
 .dot {
