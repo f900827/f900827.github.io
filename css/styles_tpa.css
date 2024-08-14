@@ -18,6 +18,20 @@ a {
     color: #252323;
 }
 
+label {
+    min-width: 100px;
+} 
+
+input {
+    flex: 1;
+}
+
+#input {
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 10px;
+}
+
 .plus-sign {
     position: absolute;
     top: 50%;
@@ -40,12 +54,21 @@ a {
     display: none;
 }
 
-#startButton {
-    position: absolute;
-    top: 50%;
+.button {
+    display: block; 
     padding: 10px 10px;
     font-size: 20px;
     background-color: #6c6c6c;
+    margin: auto;
+}
+
+
+#startButton_Div {
+    display: none;
+}
+
+#message {
+    display: none;
 }
 
 #experiment {

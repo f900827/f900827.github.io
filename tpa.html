@@ -8,7 +8,43 @@
     <script src="js/script_tpa.js" defer></script>
 </head>
 <body>
-    <button id="startButton">點擊開始</button>
+    <div id="init">
+        <div id="input">
+            <label for="subjectId">受試者編號:</label>
+            <input type="text" id="subjectId" name="subjectId">
+        </div>
+        
+        <div id="input">
+            <label for="age">年齡:</label>
+            <input type="number" id="age" name="age">
+        </div>
+        
+        <div id="input">
+            <label for="gender">性別:</label>
+            <input type="text" id="gender" name="gender">
+        </div>
+        
+        <div id="input">
+            <label for="department">科系:</label>
+            <input type="text" id="department" name="department">
+        </div>
+        <div id="input">
+            <label for="pattern">模式:</label>
+            <input type="text" id="pattern" name="pattern">
+        </div>
+        
+        <button type="button" id="confirmButton" class="button">確認</button>
+    </div>
+
+    <div id="startButton_Div">
+        <button type="button" id="startButton" class="button">點擊開始</button>
+    </div>
+
+    <div id="message">
+        <p id="info">本次實驗結束，下一輪實驗請使用：觸控螢幕</p>
+        <button type="button" id="okButton" class="button">OK</button>
+    </div>
+    
     <div id="experiment">
         <div class="plus-sign">+</div>
         <div class="dot"></div>

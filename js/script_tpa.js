@@ -2,21 +2,59 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     const startButton = document.getElementById('startButton');
+    const startButtonBlock = document.getElementById('startButton_Div');
+    const confirmButton = document.getElementById('confirmButton');
+    const okButton = document.getElementById('okButton');
+    const initBlock = document.getElementById('init');
     const experiment = document.getElementById('experiment');
     const plusSign = document.querySelector('.plus-sign');
     const indicatorVertical = document.getElementById('indicator-vertical');
     const indicatorHorizontal = document.getElementById('indicator-horizontal');
     const textContainer = document.getElementById('text-container');
-    const maxTrials = 24;
+    const idInputBox = document.getElementById('subjectId');
+    const ageInputBox = document.getElementById('age');
+    const genderInputBox = document.getElementById('gender');
+    const depInputBox = document.getElementById('department');
+    const patternInputBox = document.getElementById('pattern');
+    const message = document.getElementById('info');
+    const messageBlock = document.getElementById('message');
+    // 每個方向最多出現幾次
+    const maxPerDirection = 6;
+    // 一次實驗總Trial數量 = maxPerDirection * 4
+    const maxTrials = maxPerDirection * 4;
     let isExperimentRunning = false;
     let trialCount = 0;
-    let startTime, timeoutId;
-    let directionArray = generateDirectionArray();
     let currentDirection = 'none';
     let waitClick = true;
+    let patternArr, directionArray;
+    let startTime, timeoutId;
+
+    confirmButton.addEventListener('click', function() {
+        confirmButton.disabled = true;
+        patternArr = patternInputBox.value.split(',');
+
+        // 如果陣列只包含 't' 和 'm'，則返回 true，否則返回 false
+        const isValid = patternArr.every(element => element === 't' || element === 'm');
+        if(!isValid){
+            alert('模式輸入錯誤，請檢查');
+            confirmButton.disabled = false;
+        }else{
+            directionArray = generateDirectionArray(patternArr.length);
+            initBlock.style.display = 'none';
+            startButtonBlock.style.display = 'flex';
+            // 將第一輪的pattern從陣列中移除
+            patternArr.shift();
+        }
+    });
 
     startButton.addEventListener('click', function() {
         startButton.style.display = 'none';
+        experiment.style.display = 'flex';
+        showPlusSign();
+    });
+
+    okButton.addEventListener('click', function() {
+        messageBlock.style.display = 'none';
         experiment.style.display = 'flex';
         showPlusSign();
     });
@@ -61,14 +99,17 @@ function init() {
     }
 
     // 產生本次實驗之所有directions
-    function generateDirectionArray() {
+    function generateDirectionArray(times) {
         const directions = ['up', 'down', 'left', 'right'];
-        const maxPerDirection = 6;
     
         // 初始化包含每個方向6次的陣列
         let directionArray = [];
-        for (let i = 0; i < maxPerDirection; i++) {
-            directionArray.push(...directions);
+        // 有幾個pattern就執行幾次
+        for(let t = 0; t < times; t++){
+            // 加入maxTrial數量的directions
+            for (let i = 0; i < maxPerDirection; i++) {
+                directionArray.push(...directions);
+            }
         }
     
         // 使用Fisher-Yates算法洗牌陣列
@@ -178,8 +219,21 @@ function init() {
         if (trialCount < maxTrials) {
             setTimeout(showPlusSign(), 500);
         } else {
-            resetState();
-            alert('Experiment completed \n請通知實驗人員');
+            // trial數歸零
+            trialCount = 0
+            // 檢查下一輪之pattern
+            const nextPattern = patternArr.shift();
+            if(nextPattern == 't'){
+                message.innerText = "本次實驗結束，下一輪實驗請使用：觸控螢幕"
+            }else if(nextPattern == 'm'){
+                message.innerText = "本次實驗結束，下一輪實驗請使用：滑鼠"
+            }else{
+                message.innerText = "Experiment completed! \n請通知實驗人員"
+                okButton.style.display = 'none';
+            }
+            experiment.style.display = 'none';
+            messageBlock.style.display = 'block';
+            
             //重整頁面
             //window.location.reload();
         }
