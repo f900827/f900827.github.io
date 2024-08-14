@@ -179,7 +179,10 @@ function init() {
             setTimeout(showPlusSign(), 500);
         } else {
             resetState();
-            alert('Experiment completed \n請通知實驗人員');
+            setTimeout(() => {
+                alert('Experiment completed \n請通知實驗人員');    
+            }, 500);
+            
             //重整頁面
             //window.location.reload();
         }
