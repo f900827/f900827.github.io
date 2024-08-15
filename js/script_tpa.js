@@ -1,11 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'
-
-// If you enabled Analytics in your project, add the Firebase SDK for Google Analytics
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js'
-
-// Add Firebase products that you want to use
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js'
-import { getFirestore, collection, addDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js'
+import { getFirestore, collection, doc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js'
 
 const firebaseConfig = {
     apiKey: "AIzaSyAVc7Yu9ul0mQ-kaYFTSGzCeP2nyH8Q7rk",
@@ -41,18 +35,23 @@ function init() {
     const message = document.getElementById('info');
     const messageBlock = document.getElementById('message');
     // 每個方向最多出現幾次
-    const maxPerDirection = 6;
+    const maxPerDirection = 1;
     // 一次實驗總Trial數量 = maxPerDirection * 4
     const maxTrials = maxPerDirection * 4;
     let isExperimentRunning = false;
-    let trialCount = 0;
-    let currentDirection = 'none';
     let waitClick = true;
-    let patternArr, directionArray;
-    let startTime, timeoutId;
+    let trialCount = 0;
+    let currentPattern = 0;
+    let currentDirection = 'none';
+    let patternArr, directionArray, startTime, timeoutId, subjectId;
+    let [currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr] = [[],[],[],[]];
 
-    confirmButton.addEventListener('click', function () {
+    confirmButton.addEventListener('click', async function () {
         confirmButton.disabled = true;
+
+        // 檢測inputBox是否有空值
+        checkInputEmpty();
+
         patternArr = patternInputBox.value.split(',');
 
         // 如果陣列只包含 't' 和 'm'，則返回 true，否則返回 false
@@ -60,13 +59,27 @@ function init() {
         if (!isValid) {
             alert('模式輸入錯誤，請檢查');
             confirmButton.disabled = false;
+            return
         } else {
-            directionArray = generateDirectionArray(patternArr.length);
-            initBlock.style.display = 'none';
-            startButtonBlock.style.display = 'flex';
-            // 將第一輪的pattern從陣列中移除
-            patternArr.shift();
+            patternArr.push("END");
         }
+
+        directionArray = generateDirectionArray(patternArr.length);
+        subjectId = idInputBox.value;
+
+        await createSubjectDoc(subjectId, ageInputBox.value, genderInputBox.value, depInputBox.value);
+        // for(let i = 1; i <= patternArr.length; i++){
+        //     await createTrialsDoc(subjectId, i, patternArr[i - 1]);
+        // }
+        if (patternArr[0] == 't'){
+            message.innerText = "實驗即將開始，第一輪實驗請使用：觸控螢幕"
+        }else{
+            message.innerText = "實驗即將開始，第一輪實驗請使用：滑鼠"
+        }
+        initBlock.style.display = 'none';
+        messageBlock.style.display = 'block';
+        
+        //startButtonBlock.style.display = 'flex';
     });
 
     startButton.addEventListener('click', function () {
@@ -187,6 +200,11 @@ function init() {
 
         console.log(`Trial ${trialCount}\nDirection: ${currentDirection}. No reaction.`);
 
+        currentComArr.push('N/A');
+        currentDictionArr.push(currentDirection);
+        currentIndexClickArr.push('N/A');
+        currentRTArr.push('N/A');
+
         textContainer.style.display = 'none';
         indicatorHorizontal.style.display = 'none';
         indicatorVertical.style.display = 'none';
@@ -207,6 +225,10 @@ function init() {
 
         // 紀錄當次行為資料(DB寫入點)
         console.log(`Trial ${trialCount}\nDirection: ${currentDirection} \nCircle Index: ${index} \nRT: ${responseTime}ms\nInput type: ${inputType}\ncom: ${COM}`);
+        currentComArr.push(COM);
+        currentDictionArr.push(currentDirection);
+        currentIndexClickArr.push(index);
+        currentRTArr.push(responseTime);
 
         // 移動文本到正中間
         textContainer.style.top = '50%';
@@ -238,33 +260,86 @@ function init() {
         if (trialCount < maxTrials) {
             setTimeout(showPlusSign(), 500);
         } else {
-            // trial數歸零
-            trialCount = 0
             // 檢查下一輪之pattern
-            const nextPattern = patternArr.shift();
-            if (nextPattern == 't') {
-                message.innerText = "本次實驗結束，下一輪實驗請使用：觸控螢幕"
-            } else if (nextPattern == 'm') {
-                message.innerText = "本次實驗結束，下一輪實驗請使用：滑鼠"
-            } else {
-                message.innerText = "Experiment completed! \n請通知實驗人員"
-                okButton.style.display = 'none';
+            const nextPattern = patternArr[currentPattern + 1];
+            switch (nextPattern) {
+                case 't':
+                    message.innerText = "本次實驗結束，下一輪實驗請使用：觸控螢幕"
+                    break;
+                case 'm':
+                    message.innerText = "本次實驗結束，下一輪實驗請使用：滑鼠"
+                    break;
+                case 'END':
+                    message.innerText = "Experiment completed! \n請通知實驗人員"
+                    okButton.style.display = 'none';
+                    break;
+                default:
+                    break;
             }
+            createTrialsDoc(subjectId, currentPattern + 1, patternArr[currentPattern], currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr)
             experiment.style.display = 'none';
             messageBlock.style.display = 'block';
 
-            //重整頁面
-            //window.location.reload();
+            // 重置資料陣列
+            currentComArr = [];
+            currentDictionArr = [];
+            currentIndexClickArr = [];
+            currentRTArr = [];
+
+            // trial數歸零
+            trialCount = 0
+            // 移動currentPattern指標
+            currentPattern++;
         }
+    }
+
+    function checkInputEmpty() {
+        if (idInputBox.value == '') {
+            alert("請輸入受試者編號");
+            confirmButton.disabled = false;
+            return
+        } else if (ageInputBox.value == '') {
+            alert("請輸入年齡");
+            confirmButton.disabled = false;
+            return
+        } else if (genderInputBox.value == '') {
+            alert("請輸入性別");
+            confirmButton.disabled = false;
+            return
+        } else if (depInputBox.value == '') {
+            alert("請輸入科系");
+            confirmButton.disabled = false;
+            return
+        } else if (patternInputBox.value == '') {
+            alert("請輸入實驗模式");
+            confirmButton.disabled = false;
+            return
+        }
+    }
+
+    async function createSubjectDoc(subjectId, age, gender, department) {
+        const subjectDocRef = doc(db, "experiment", subjectId);
+        await setDoc(subjectDocRef, {
+            age,
+            gender,
+            department,
+        },
+            { merge: true },
+        );
+    }
+
+    async function createTrialsDoc(subjectId, count, pattern, comArr, directionsArr, indexClickedArr, responseTimeArr) {
+        const trialDocRef = doc(db, "experiment", subjectId, "trials", String(count + pattern));
+        await setDoc(trialDocRef, {
+            com: comArr,
+            directions: directionsArr,
+            indexClicked: indexClickedArr,
+            responseTime: responseTimeArr,
+            pattern,
+            finishedTime: serverTimestamp(),
+        },
+            { merge: true },
+        );
     }
 }
 
-const docRef = doc(db, "expirement", "AfUg1vv54WmNWShNlXpC");
-const docSnap = await getDoc(docRef);
-
-if (docSnap.exists()) {
-    console.log("Document data:", docSnap.data());
-} else {
-    // docSnap.data() will be undefined in this case
-    console.log("No such document!");
-}
