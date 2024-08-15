@@ -50,7 +50,9 @@ function init() {
         confirmButton.disabled = true;
 
         // 檢測inputBox是否有空值
-        checkInputEmpty();
+        if(!checkInputEmpty()){
+            return
+        }
 
         patternArr = patternInputBox.value.split(',');
 
@@ -297,24 +299,25 @@ function init() {
         if (idInputBox.value == '') {
             alert("請輸入受試者編號");
             confirmButton.disabled = false;
-            return
+            return false
         } else if (ageInputBox.value == '') {
             alert("請輸入年齡");
             confirmButton.disabled = false;
-            return
+            return false
         } else if (genderInputBox.value == '') {
             alert("請輸入性別");
             confirmButton.disabled = false;
-            return
+            return false
         } else if (depInputBox.value == '') {
             alert("請輸入科系");
             confirmButton.disabled = false;
-            return
+            return false
         } else if (patternInputBox.value == '') {
             alert("請輸入實驗模式");
             confirmButton.disabled = false;
-            return
+            return false
         }
+        return true
     }
 
     async function createSubjectDoc(subjectId, age, gender, department) {
