@@ -1,3 +1,25 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'
+
+// If you enabled Analytics in your project, add the Firebase SDK for Google Analytics
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js'
+
+// Add Firebase products that you want to use
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js'
+import { getFirestore, collection, addDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js'
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAVc7Yu9ul0mQ-kaYFTSGzCeP2nyH8Q7rk",
+    authDomain: "fangyu-315ac.firebaseapp.com",
+    projectId: "fangyu-315ac",
+    storageBucket: "fangyu-315ac.appspot.com",
+    messagingSenderId: "726433214510",
+    appId: "1:726433214510:web:2de49df88ae021fa876fbf"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
@@ -29,16 +51,16 @@ function init() {
     let patternArr, directionArray;
     let startTime, timeoutId;
 
-    confirmButton.addEventListener('click', function() {
+    confirmButton.addEventListener('click', function () {
         confirmButton.disabled = true;
         patternArr = patternInputBox.value.split(',');
 
         // 如果陣列只包含 't' 和 'm'，則返回 true，否則返回 false
         const isValid = patternArr.every(element => element === 't' || element === 'm');
-        if(!isValid){
+        if (!isValid) {
             alert('模式輸入錯誤，請檢查');
             confirmButton.disabled = false;
-        }else{
+        } else {
             directionArray = generateDirectionArray(patternArr.length);
             initBlock.style.display = 'none';
             startButtonBlock.style.display = 'flex';
@@ -47,26 +69,26 @@ function init() {
         }
     });
 
-    startButton.addEventListener('click', function() {
+    startButton.addEventListener('click', function () {
         startButton.style.display = 'none';
         experiment.style.display = 'flex';
         showPlusSign();
     });
 
-    okButton.addEventListener('click', function() {
+    okButton.addEventListener('click', function () {
         messageBlock.style.display = 'none';
         experiment.style.display = 'flex';
         showPlusSign();
     });
 
-    plusSign.addEventListener('click', function() {
+    plusSign.addEventListener('click', function () {
         hidePlusSign();
         startTrial();
     });
 
     [indicatorVertical, indicatorHorizontal].forEach(indicator => {
         ['click', 'touchstart'].forEach(eventType => {
-            indicator.addEventListener(eventType, function(event) {
+            indicator.addEventListener(eventType, function (event) {
                 if (isExperimentRunning && event.target.classList.contains('circle') && waitClick) {
                     waitClick = false;
                     const inputType = eventType === 'click' ? 'mouse' : 'touch';
@@ -101,23 +123,23 @@ function init() {
     // 產生本次實驗之所有directions
     function generateDirectionArray(times) {
         const directions = ['up', 'down', 'left', 'right'];
-    
+
         // 初始化包含每個方向6次的陣列
         let directionArray = [];
         // 有幾個pattern就執行幾次
-        for(let t = 0; t < times; t++){
+        for (let t = 0; t < times; t++) {
             // 加入maxTrial數量的directions
             for (let i = 0; i < maxPerDirection; i++) {
                 directionArray.push(...directions);
             }
         }
-    
+
         // 使用Fisher-Yates算法洗牌陣列
         for (let i = directionArray.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [directionArray[i], directionArray[j]] = [directionArray[j], directionArray[i]];
         }
-    
+
         return directionArray;
     }
 
@@ -130,30 +152,27 @@ function init() {
                 indicatorVertical.style.display = 'block';
                 textContainer.style.top = '5%';
                 textContainer.style.left = '50%';
-                textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
             case 'down':
                 indicatorVertical.style.display = 'block';
                 textContainer.style.top = '95%';
                 textContainer.style.left = '50%';
-                textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
             case 'left':
                 indicatorHorizontal.style.display = 'flex';
                 textContainer.style.top = '50%';
                 textContainer.style.left = '5%';
-                textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
             case 'right':
                 indicatorHorizontal.style.display = 'flex';
                 textContainer.style.top = '50%';
                 textContainer.style.left = '95%';
-                textContainer.style.transform = 'translate(-50%, -50%)';
                 break;
             default:
                 break;
         }
 
+        textContainer.style.transform = 'translate(-50%, -50%)';
         textContainer.style.display = 'block';
 
         startTime = Date.now();
@@ -205,17 +224,17 @@ function init() {
     }
 
     // 檢查當前點擊之圓點是否與文章方向一致
-    function checkCOM(index){
+    function checkCOM(index) {
         let directionIndexArr = ['up', '', 'down', 'left', '', 'right'];
-        if(directionIndexArr[index] == currentDirection){
+        if (directionIndexArr[index] == currentDirection) {
             return 1;
-        }else{
+        } else {
             return 0;
         }
     }
-     
+
     // 檢查當前Trial是否到達上限
-    function checkIfExceedMaxTrials(){
+    function checkIfExceedMaxTrials() {
         if (trialCount < maxTrials) {
             setTimeout(showPlusSign(), 500);
         } else {
@@ -223,19 +242,29 @@ function init() {
             trialCount = 0
             // 檢查下一輪之pattern
             const nextPattern = patternArr.shift();
-            if(nextPattern == 't'){
+            if (nextPattern == 't') {
                 message.innerText = "本次實驗結束，下一輪實驗請使用：觸控螢幕"
-            }else if(nextPattern == 'm'){
+            } else if (nextPattern == 'm') {
                 message.innerText = "本次實驗結束，下一輪實驗請使用：滑鼠"
-            }else{
+            } else {
                 message.innerText = "Experiment completed! \n請通知實驗人員"
                 okButton.style.display = 'none';
             }
             experiment.style.display = 'none';
             messageBlock.style.display = 'block';
-            
+
             //重整頁面
             //window.location.reload();
         }
     }
+}
+
+const docRef = doc(db, "expirement", "AfUg1vv54WmNWShNlXpC");
+const docSnap = await getDoc(docRef);
+
+if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+} else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
 }
