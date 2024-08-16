@@ -33,18 +33,15 @@ function init() {
     const depInputBox = document.getElementById('department');
     const patternInputBox = document.getElementById('pattern');
     const testMode = document.getElementById('test');
+    const maxPerDirectionInputBox = document.getElementById('maxPerDirection');
     const message = document.getElementById('info');
     const messageBlock = document.getElementById('message');
-    // 每個方向最多出現幾次
-    const maxPerDirection = 1;
-    // 一次實驗總Trial數量 = maxPerDirection * 4
-    const maxTrials = maxPerDirection * 4;
     let isExperimentRunning = false;
     let waitClick = true;
     let trialCount = 0;
     let currentPattern = 0;
     let currentDirection = 'none';
-    let patternArr, directionArray, startTime, timeoutId, subjectId;
+    let patternArr, directionArray, startTime, timeoutId, subjectId, maxPerDirection, maxTrials;
     let [currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr] = [[], [], [], []];
 
     confirmButton.addEventListener('click', async function () {
@@ -56,6 +53,21 @@ function init() {
                 return
             }
         }
+        // 如未指定maxPerDirection則使用預設值
+        if (maxPerDirectionInputBox.value != '') {
+            // 檢查maxPerDirection輸入是否為純數字
+            if (isNaN(Number(maxPerDirectionInputBox.value))) {
+                alert("次數輸入應為數字，請檢查")
+                confirmButton.disabled = false;
+                return
+            } else {
+                maxPerDirection = Number(maxPerDirectionInputBox.value);
+            }
+        } else {
+            // 預設值
+            maxPerDirection = 6;
+        }
+        maxTrials = maxPerDirection * 4;
 
         patternArr = patternInputBox.value.split(',');
 
