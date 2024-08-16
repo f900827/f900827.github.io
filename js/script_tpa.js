@@ -32,6 +32,7 @@ function init() {
     const genderInputBox = document.getElementById('gender');
     const depInputBox = document.getElementById('department');
     const patternInputBox = document.getElementById('pattern');
+    const testMode = document.getElementById('test');
     const message = document.getElementById('info');
     const messageBlock = document.getElementById('message');
     // 每個方向最多出現幾次
@@ -44,14 +45,16 @@ function init() {
     let currentPattern = 0;
     let currentDirection = 'none';
     let patternArr, directionArray, startTime, timeoutId, subjectId;
-    let [currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr] = [[],[],[],[]];
+    let [currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr] = [[], [], [], []];
 
     confirmButton.addEventListener('click', async function () {
         confirmButton.disabled = true;
 
         // 檢測inputBox是否有空值
-        if(checkInputEmpty()){
-            return
+        if (!testMode.checked) {
+            if (checkInputEmpty()) {
+                return
+            }
         }
 
         patternArr = patternInputBox.value.split(',');
@@ -69,18 +72,18 @@ function init() {
         directionArray = generateDirectionArray(patternArr.length);
         subjectId = idInputBox.value;
 
-        await createSubjectDoc(subjectId, ageInputBox.value, genderInputBox.value, depInputBox.value);
-        // for(let i = 1; i <= patternArr.length; i++){
-        //     await createTrialsDoc(subjectId, i, patternArr[i - 1]);
-        // }
-        if (patternArr[0] == 't'){
+        if (!testMode.checked) {
+            await createSubjectDoc(subjectId, ageInputBox.value, genderInputBox.value, depInputBox.value);
+        }
+
+        if (patternArr[0] == 't') {
             message.innerText = "實驗即將開始，第一輪實驗請使用：觸控螢幕"
-        }else{
+        } else {
             message.innerText = "實驗即將開始，第一輪實驗請使用：滑鼠"
         }
         initBlock.style.display = 'none';
         messageBlock.style.display = 'block';
-        
+
         //startButtonBlock.style.display = 'flex';
     });
 
@@ -278,7 +281,9 @@ function init() {
                 default:
                     break;
             }
-            createTrialsDoc(subjectId, currentPattern + 1, patternArr[currentPattern], currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr)
+            if (!testMode.checked) {
+                createTrialsDoc(subjectId, currentPattern + 1, patternArr[currentPattern], currentComArr, currentDictionArr, currentIndexClickArr, currentRTArr)
+            }
             experiment.style.display = 'none';
             messageBlock.style.display = 'block';
 
