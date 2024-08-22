@@ -89,9 +89,9 @@ function init() {
         }
 
         if (patternArr[0] == 't') {
-            message.innerText = "實驗即將開始，第一輪實驗請使用：觸控螢幕"
+            message.innerText = "實驗即將開始\n\n請注意，您的任務為讓遮蔽的文字進入畫面\n第一輪實驗請使用：手指操控觸控螢幕"
         } else {
-            message.innerText = "實驗即將開始，第一輪實驗請使用：滑鼠"
+            message.innerText = "實驗即將開始\n\n請注意，您的任務為讓遮蔽的文字進入畫面\n第一輪實驗請使用：滑鼠"
         }
         initBlock.style.display = 'none';
         messageBlock.style.display = 'block';

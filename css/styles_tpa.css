@@ -33,6 +33,11 @@ input {
     margin-bottom: 10px;
 }
 
+.instructions {
+    display: none;
+    
+}
+
 .plus-sign {
     position: absolute;
     top: 50%;
@@ -74,7 +79,7 @@ input {
 }
 
 #experiment {
-    display: none;
+    display: block;
     width: 90%;
     height: 90%;
     justify-content:center;
@@ -105,9 +110,10 @@ input {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    display: none;
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: column;
+    height: auto;
 }
     
 #indicator-horizontal {
@@ -117,17 +123,20 @@ input {
     transform: translateX(-50%);
     display: none;
     width: auto;
+    height: auto;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
 }
     
 .circle {
     width: 60px;
     height: 60px;
-    /* background-color: #a7a4a4; */
     border-radius: 50%;
     margin: 5px; 
     cursor: pointer; 
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -149,6 +158,8 @@ input {
 
 .circle[data-index="1"],
 .circle[data-index="4"] {
+    width: 50px;
+    height: 50px;
     background-color: #a7a4a4;  
     cursor: default; 
     pointer-events: none;  
