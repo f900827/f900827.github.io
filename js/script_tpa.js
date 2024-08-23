@@ -179,12 +179,12 @@ function init() {
         // 針對不同direction處理UI顯示
         switch (currentDirection) {
             case 'up':
-                indicatorVertical.style.display = 'block';
+                indicatorVertical.style.display = 'flex';
                 textContainer.style.top = '5%';
                 textContainer.style.left = '50%';
                 break;
             case 'down':
-                indicatorVertical.style.display = 'block';
+                indicatorVertical.style.display = 'flex';
                 textContainer.style.top = '95%';
                 textContainer.style.left = '50%';
                 break;
@@ -233,6 +233,9 @@ function init() {
         if (!isExperimentRunning) return;
         // 若有點擊則取消NoReaction Timeout
         clearTimeout(timeoutId);
+        document.querySelectorAll('.circle').forEach(circle => circle.classList.remove('active'));
+        // 為當前點擊的 circle 添加 active 類
+        event.target.classList.add('active');
 
         let COM = checkCOM(index);
 

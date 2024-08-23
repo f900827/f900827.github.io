@@ -27,6 +27,18 @@ input {
     flex: 1;
 }
 
+
+#init {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
 #input {
     display: flex; 
     justify-content: space-between; 
@@ -79,7 +91,7 @@ input {
 }
 
 #experiment {
-    display: block;
+    display: none;
     width: 90%;
     height: 90%;
     justify-content:center;
@@ -110,10 +122,16 @@ input {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: column;
+    display: none;
+    width: auto;
     height: auto;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+
 }
     
 #indicator-horizontal {
@@ -127,18 +145,28 @@ input {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
 }
     
 .circle {
-    width: 60px;
-    height: 60px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     margin: 5px; 
     cursor: pointer; 
-    align-items: center;
-    justify-content: center;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
 }
 
+.circle.active {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-color: white;
+}
 
 .circle[data-index="0"],
 .circle[data-index="2"],
@@ -157,11 +185,11 @@ input {
     background-color: #787575;
 } */
 
-.circle[data-index="1"],
+/* .circle[data-index="1"],
 .circle[data-index="4"] {
     width: 70px;
     height: 70px;
     background-color: #ffffff;  
     cursor: default; 
     pointer-events: none;  
-}
+} */
