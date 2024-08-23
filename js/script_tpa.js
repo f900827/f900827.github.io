@@ -131,8 +131,15 @@ function init() {
     function startTrial() {
         trialCount++;
         resetState();
+        resetCircles();
         isExperimentRunning = true;
         setTimeout(showText, 250);
+    }
+
+    function resetCircles() {
+        document.querySelectorAll('.circle').forEach(circle => {
+            circle.classList.remove('active');
+        });
     }
 
     function resetState() {
